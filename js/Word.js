@@ -1,6 +1,5 @@
 import { CONFIG } from './config.js';
 
-// Pre-built font strings so we're not constructing them every draw call
 const FONT_NORMAL = `normal ${CONFIG.WORD_FONT_SIZE}px 'Fredoka', sans-serif`;
 const FONT_BOLD   = `600 ${CONFIG.WORD_FONT_SIZE}px 'Fredoka', sans-serif`;
 
@@ -98,11 +97,6 @@ export class Word {
     }
     this._pill(ctx, px, py, w, h, r);
     ctx.stroke();
-
-    ctx.fillStyle = this._colors.base;
-    ctx.beginPath();
-    ctx.arc(px + 10, y, 3, 0, Math.PI * 2);
-    ctx.fill();
 
     ctx.font = this.isMatched ? FONT_BOLD : FONT_NORMAL;
     ctx.textBaseline = 'middle';
