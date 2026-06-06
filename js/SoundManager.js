@@ -18,38 +18,41 @@ export class SoundManager {
 
   init() {
     if (this._initialized) return;
-    try {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (AC) {
-        this._ctx = new AC();
-        const master = this._ctx.createGain();
-        master.gain.value = 1;
-        master.connect(this._ctx.destination);
-
-        this._sfxGain = this._ctx.createGain();
-        this._sfxGain.gain.value = this._sfxVolume;
-        this._sfxGain.connect(master);
-
-        this._musicGain = this._ctx.createGain();
-        this._musicGain.gain.value = this._musicVolume;
-        this._musicGain.connect(master);
-      }
-    } catch (e) {
-      console.warn('Web Audio API unavailable:', e);
-    }
+    this._initialized = true;
 
     const unlock = () => {
-      if (this._ctx?.state === 'suspended') this._ctx.resume();
+      if (!this._ctx) {
+        try {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) {
+            this._ctx = new AC();
+            const master = this._ctx.createGain();
+            master.gain.value = 1;
+            master.connect(this._ctx.destination);
+
+            this._sfxGain = this._ctx.createGain();
+            this._sfxGain.gain.value = this._sfxVolume;
+            this._sfxGain.connect(master);
+
+            this._musicGain = this._ctx.createGain();
+            this._musicGain.gain.value = this._musicVolume;
+            this._musicGain.connect(master);
+          }
+        } catch (e) {
+          console.warn('Web Audio API unavailable:', e);
+        }
+      } else if (this._ctx.state === 'suspended') {
+        this._ctx.resume();
+      }
       document.removeEventListener('keydown', unlock, true);
-      document.removeEventListener('click', unlock, true);
+      document.removeEventListener('click',   unlock, true);
       document.removeEventListener('touchstart', unlock, true);
     };
-    document.addEventListener('keydown', unlock, true);
-    document.addEventListener('click', unlock, true);
+    document.addEventListener('keydown',    unlock, true);
+    document.addEventListener('click',      unlock, true);
     document.addEventListener('touchstart', unlock, true);
 
     this._loadConfigFiles();
-    this._initialized = true;
   }
 
   _loadConfigFiles() {
@@ -69,10 +72,6 @@ export class SoundManager {
     audio.loop    = loop;
     audio.onerror = (e) => console.error(`[SoundManager] Failed to load "${src}" —`, e.type, audio.error);
     return audio;
-  }
-
-  _resumeCtx() {
-    if (this._ctx?.state === 'suspended') this._ctx.resume();
   }
 
   play(name) {
@@ -102,12 +101,11 @@ export class SoundManager {
     this._musicAudio.currentTime = 0;
   }
 
-  setSfxEnabled(val)  { this._sfxEnabled = val; }
+  setSfxEnabled(val) { this._sfxEnabled = val; }
 
   setMusicEnabled(val) {
     this._musicEnabled = val;
     if (!val) this.stopMusic();
-    else this.startMusic();
   }
 
   setSfxVolume(v) {
