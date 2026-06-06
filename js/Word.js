@@ -75,8 +75,8 @@ export class Word {
     ctx.save();
     ctx.globalAlpha = this.opacity;
 
-    const x = this.x;
-    const y = this.y;
+    const x = Math.round(this.x);
+    const y = Math.round(this.y);
     const w = this.width;
     const h = this.height;
     const r = 8;
