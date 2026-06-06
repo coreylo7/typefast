@@ -213,19 +213,6 @@ export class Game {
       this._soundManager.setMusicVolume(v);
     });
 
-    // YouTube URL — load preview when user stops typing (debounced)
-    const ytInput = document.getElementById('yt-url-input');
-    if (ytInput) {
-      let ytDebounce;
-      ytInput.addEventListener('input', () => {
-        clearTimeout(ytDebounce);
-        ytDebounce = setTimeout(() => {
-          this._settings.ytUrl = ytInput.value.trim();
-          this._updateYTStatus(this._settings.ytUrl);
-        }, 600);
-      });
-    }
-
     this._on('btn-back-howto', 'click', () => this._uiManager.showScreen(STATE.MAIN_MENU));
   }
 
@@ -399,32 +386,11 @@ export class Game {
     const musicToggle = document.getElementById('toggle-music');
     const sfxVol = document.getElementById('sfx-volume');
     const musicVol = document.getElementById('music-volume');
-    const ytInput = document.getElementById('yt-url-input');
     if (sfxToggle)   sfxToggle.checked   = this._settings.sfxEnabled;
     if (musicToggle) musicToggle.checked = this._settings.musicEnabled;
     if (sfxVol)      sfxVol.value        = this._settings.sfxVolume;
     if (musicVol)    musicVol.value      = this._settings.musicVolume;
-    if (ytInput)     ytInput.value       = this._settings.ytUrl || '5Ac941RYeKo';
-    this._updateYTStatus(this._settings.ytUrl);
     this._uiManager.showScreen(STATE.SETTINGS);
-  }
-
-  _updateYTStatus(url) {
-    const statusEl = document.getElementById('yt-status');
-    if (!statusEl) return;
-    if (!url) {
-      statusEl.textContent = 'Using procedural ambient music';
-      statusEl.dataset.state = 'idle';
-      return;
-    }
-    const id = this._soundManager._parseYTId(url);
-    if (id) {
-      statusEl.textContent = `Video ID: ${id}  ✓`;
-      statusEl.dataset.state = 'valid';
-    } else {
-      statusEl.textContent = 'Invalid YouTube URL';
-      statusEl.dataset.state = 'error';
-    }
   }
 
   _applySettings() {
@@ -432,17 +398,9 @@ export class Game {
     this._soundManager.setMusicEnabled(this._settings.musicEnabled);
     this._soundManager.setSfxVolume(this._settings.sfxVolume);
     this._soundManager.setMusicVolume(this._settings.musicVolume);
-    if (this._settings.ytUrl) {
-      this._soundManager.loadYouTube(this._settings.ytUrl);
-    }
   }
 
   _saveSettings() {
-    const ytInput = document.getElementById('yt-url-input');
-    if (ytInput) this._settings.ytUrl = ytInput.value.trim();
-
-    this._soundManager.loadYouTube(this._settings.ytUrl || '');
-
     try {
       localStorage.setItem('typingRacer_settings', JSON.stringify(this._settings));
     } catch (_) {}
@@ -463,7 +421,6 @@ export class Game {
       musicEnabled: true,
       sfxVolume: 0.5,
       musicVolume: 0.25,
-      ytUrl: '',
     };
   }
 

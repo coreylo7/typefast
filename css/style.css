@@ -392,40 +392,6 @@ html, body {
   transition: width 0.1s linear;
 }
 
-.yt-help {
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 12px;
-}
-.yt-input-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-.yt-input {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--surface-border);
-  border-radius: var(--radius-sm);
-  padding: 9px 14px;
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 0.9rem;
-  outline: none;
-  transition: border-color 0.15s;
-}
-.yt-input:focus { border-color: var(--primary); }
-.yt-input::placeholder { color: var(--text-muted); }
-.yt-status {
-  font-size: 0.78rem;
-  padding: 4px 0;
-  color: var(--text-muted);
-}
-.yt-status[data-state="valid"] { color: var(--accent); }
-.yt-status[data-state="error"] { color: var(--danger); }
-.yt-status[data-state="idle"]  { color: var(--text-muted); }
-
 #pause-menu {
   position: fixed;
   inset: 0;
