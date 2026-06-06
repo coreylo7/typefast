@@ -67,7 +67,7 @@ export class SoundManager {
     const audio = new Audio(src);
     audio.preload = 'auto';
     audio.loop    = loop;
-    audio.onerror = () => console.warn(`[SoundManager] Failed to load: ${src}`);
+    audio.onerror = (e) => console.error(`[SoundManager] Failed to load "${src}" —`, e.type, audio.error);
     return audio;
   }
 
@@ -93,7 +93,7 @@ export class SoundManager {
   startMusic() {
     if (!this._musicEnabled || !this._musicAudio) return;
     this._musicAudio.volume = this._musicVolume;
-    this._musicAudio.play().catch(() => {});
+    this._musicAudio.play().catch(err => console.error('[SoundManager] startMusic failed:', err));
   }
 
   stopMusic() {
