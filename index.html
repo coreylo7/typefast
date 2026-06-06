@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>type</title>
+  <meta name="description" content="A fast-paced typing game. Type words before they escape the screen!" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!--canvas-->
+  <div id="canvas-wrapper">
+    <canvas id="game-canvas"></canvas>
+  </div>
+
+  <!--HUD-->
+  <div id="hud" class="hidden">
+    <div class="hud-section">
+      <div class="hud-item">
+        <span class="hud-label">Score</span>
+        <span id="hud-score" class="hud-value score">0</span>
+      </div>
+      <span id="hud-combo" class="combo-badge level-0"></span>
+    </div>
+
+    <div class="hud-section">
+      <div class="hud-item">
+        <span class="hud-label">WPM</span>
+        <span id="hud-wpm" class="hud-value">0 WPM</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Accuracy</span>
+        <span id="hud-accuracy" class="hud-value">100%</span>
+      </div>
+    </div>
+
+    <div class="hud-section">
+      <div class="hud-item">
+        <span class="hud-label">Streak</span>
+        <span id="hud-streak" class="hud-value">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Lives</span>
+        <div id="hud-lives" class="hud-value hearts"></div>
+      </div>
+    </div>
+  </div>
+
+  <button id="btn-pause" class="btn btn-ghost hidden">⏸ Pause</button>
+
+  <div id="powerup-display"></div>
+
+  <div id="notification" class="hidden"></div>
+
+  <div id="type-input" class="hidden">
+    <span class="input-text"></span><span class="input-cursor"></span>
+    <span class="input-hint"></span>
+  </div>
+  <div class="input-instructions hidden" id="input-instructions">
+    Type words · Press <strong>Enter</strong> to confirm · <strong>Esc</strong> to pause
+  </div>
+
+  <div id="overlay" class="active">
+
+    <!--main menu-->
+    <div id="screen-main" class="screen">
+      <div class="logo">
+        <h1>type fast</h1>
+        <p class="tagline"></p>
+      </div>
+      <nav class="menu-nav">
+        <button id="btn-play" class="btn btn-primary">▶ Play</button>
+        <button id="btn-howtoplay" class="btn">? How To Play</button>
+        <button id="btn-highscores-menu" class="btn">High Scores</button>
+        <button id="btn-settings-menu" class="btn">⚙ Settings</button>
+      </nav>
+    </div>
+
+    <!--select difficulty-->
+    <div id="screen-difficultySelect" class="screen hidden">
+      <h2 class="screen-title">Select Difficulty</h2>
+      <div class="diff-grid">
+        <button class="diff-btn" data-difficulty="easy">
+          <span class="diff-icon"></span>
+          <span class="diff-name">Easy</span>
+          <span class="diff-desc"></span>
+          <span class="diff-stats">
+            Slow words<br>5 lives<br>Short words
+          </span>
+        </button>
+        <button class="diff-btn" data-difficulty="medium">
+          <span class="diff-icon"></span>
+          <span class="diff-name">Medium</span>
+          <span class="diff-desc"></span>
+          <span class="diff-stats">
+            Medium speed<br>3 lives<br>Mixed lengths
+          </span>
+        </button>
+        <button class="diff-btn" data-difficulty="hard">
+          <span class="diff-icon"></span>
+          <span class="diff-name">Hard</span>
+          <span class="diff-desc"></span>
+          <span class="diff-stats">
+            Fast words<br>2 lives<br>Long words
+          </span>
+        </button>
+      </div>
+      <button id="btn-back-diff" class="btn btn-ghost">← Back</button>
+    </div>
+
+    <!--game over-->
+    <div id="screen-gameOver" class="screen hidden">
+      <p class="go-title">Game Over</p>
+      <p class="go-subtitle"></p>
+
+      <div id="go-highscore-badge" class="hidden">NEW HIGH SCORE!</div>
+
+      <div class="stats-grid">
+        <div class="stat-card highlight">
+          <div class="stat-label">Final Score</div>
+          <div id="go-score" class="stat-value">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Words Typed</div>
+          <div id="go-words" class="stat-value">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">WPM</div>
+          <div id="go-wpm" class="stat-value">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Accuracy</div>
+          <div id="go-accuracy" class="stat-value">100%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Best Streak</div>
+          <div id="go-streak" class="stat-value">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Time Survived</div>
+          <div id="go-time" class="stat-value">0:00</div>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-bottom:10px">
+        <button id="btn-restart" class="btn btn-primary">↺ Retry</button>
+        <button id="btn-hs-go" class="btn">Scores</button>
+      </div>
+      <button id="btn-menu-go" class="btn btn-ghost">← Main Menu</button>
+    </div>
+
+    <!--high scores-->
+    <div id="screen-highScores" class="screen hidden">
+      <h2 class="screen-title">High Scores</h2>
+
+      <div class="hs-tabs">
+        <button class="hs-tab active" data-diff="easy">Easy</button>
+        <button class="hs-tab" data-diff="medium">Medium</button>
+        <button class="hs-tab" data-diff="hard">Hard</button>
+      </div>
+
+      <div id="hs-panel-easy" class="hs-panel">
+        <div class="hs-header">
+          <span>#</span><span>Player</span><span>Score</span><span>WPM</span><span>Acc</span><span>Date</span>
+        </div>
+        <div id="hs-list-easy"></div>
+      </div>
+      <div id="hs-panel-medium" class="hs-panel hidden">
+        <div class="hs-header">
+          <span>#</span><span>Player</span><span>Score</span><span>WPM</span><span>Acc</span><span>Date</span>
+        </div>
+        <div id="hs-list-medium"></div>
+      </div>
+      <div id="hs-panel-hard" class="hs-panel hidden">
+        <div class="hs-header">
+          <span>#</span><span>Player</span><span>Score</span><span>WPM</span><span>Acc</span><span>Date</span>
+        </div>
+        <div id="hs-list-hard"></div>
+      </div>
+
+      <button id="btn-back-hs" class="btn btn-ghost" style="margin-top:20px">← Back</button>
+    </div>
+
+    <!--settings-->
+    <div id="screen-settings" class="screen hidden">
+      <h2 class="screen-title">Settings</h2>
+
+      <div class="settings-section">
+        <div class="settings-title">Audio</div>
+        <div class="setting-row">
+          <span class="setting-label">Sound Effects</span>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-sfx" checked />
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Background Music</span>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-music" checked />
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">SFX Volume</span>
+          <input type="range" id="sfx-volume" min="0" max="1" step="0.05" value="0.5" />
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Music Volume</span>
+          <input type="range" id="music-volume" min="0" max="1" step="0.05" value="0.25" />
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <!-- <div class="settings-title">YouTube Background Music</div>
+        <p class="yt-help">
+          Paste any YouTube URL or video ID below. The video plays silently in the
+          background — only audio is used. Leave blank to use the built-in ambient music.
+        </p>
+        <div class="yt-input-row">
+          <input
+            type="text"
+            id="yt-url-input"
+            class="yt-input"
+            placeholder="https://youtube.com/watch?v=… or video ID"
+            spellcheck="false"
+            autocomplete="off"
+          />
+        </div>
+        <div id="yt-status" class="yt-status" data-state="idle">Using procedural ambient music</div> -->
+      </div>
+
+      <button id="btn-back-settings" class="btn btn-ghost">← Save & Back</button>
+    </div>
+
+    <!--how to play (just type)-->
+    <div id="screen-howToPlay" class="screen hidden">
+      <h2 class="screen-title">How To Play</h2>
+
+      <div class="howto-section">
+        <div class="howto-title">Objective</div>
+        <div class="howto-grid">
+          <div class="howto-row">
+            Words spawn on the left and move right. Type them and press <span class="key">Enter</span> before they escape!
+          </div>
+        </div>
+      </div>
+
+      <div class="howto-section">
+        <div class="howto-title">Controls</div>
+        <div class="howto-grid">
+          <div class="howto-row"><span class="key">Type</span> Type the word you see moving</div>
+          <div class="howto-row"><span class="key">Enter</span> Submit the typed word</div>
+          <div class="howto-row"><span class="key">Backspace</span> Delete last character</div>
+          <div class="howto-row"><span class="key">Esc</span> Pause / Unpause</div>
+        </div>
+      </div>
+
+      <div class="howto-section">
+        <div class="howto-title">Word Categories</div>
+        <div class="category-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#64b5f6"></div>
+            <span>Common words</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#81c784"></div>
+            <span>Programming terms</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#ffb74d"></div>
+            <span>CS concepts</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#ce93d8"></div>
+            <span>Random vocabulary</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#ffd700"></div>
+            <span>Bonus words (3x points)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#00e5ff"></div>
+            <span>Power-up words</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="howto-section">
+        <div class="howto-title">Power-ups (cyan words)</div>
+        <div class="howto-grid">
+          <div class="howto-row"><span class="key">SLOWMO</span> Slows all words for 5s</div>
+          <div class="howto-row"><span class="key">CLEARALL</span> Destroys all words</div>
+          <div class="howto-row"><span class="key">EXTRALIFE</span> Grants +1 life</div>
+          <div class="howto-row"><span class="key">2XSCORE</span> Doubles score for 8s</div>
+        </div>
+      </div>
+
+      <button id="btn-back-howto" class="btn btn-ghost" style="margin-top:4px">← Back</button>
+    </div>
+
+  </div><!-- /overlay -->
+
+  <!--pause menu(needs fixing)-->
+  <div id="pause-menu" class="hidden">
+    <div class="screen" style="min-width:300px; max-width:380px">
+      <h2 class="screen-title" style="margin-bottom:24px">Paused</h2>
+      <div class="menu-nav">
+        <button id="btn-resume" class="btn btn-primary">▶ Resume</button>
+        <button id="btn-restart-pause" class="btn">↺ Restart</button>
+        <button id="btn-menu-pause" class="btn btn-ghost">← Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
