@@ -151,6 +151,6 @@ export const CONFIG = {
     powerup:    null,   // power-up collected
     combo:      null,   // combo milestone
     gameOver:   null,   // game over
-    music:      'assets/sounds/Bakemonogatari Medley.mp3',
+    music:      'assets/sounds/Bakemonogatari-Medley.mp3',
   },
 };
