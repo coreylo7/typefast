@@ -26,6 +26,7 @@ export class Game {
     this._difficulty = null;
     this._difficultyId = 'medium';
     this._typedInput = '';
+    this._inputAllSelected = false;
     this._lastTime = null;
     this._animFrame = null;
     this._matchedWord = null;
@@ -224,22 +225,46 @@ export class Game {
 
     if (this._state !== STATE.PLAYING) return;
 
+    if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+      e.preventDefault();
+      this._inputAllSelected = true;
+      const inputSpan = document.querySelector('#type-input .input-text');
+      if (inputSpan && inputSpan.firstChild) {
+        const sel = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(inputSpan);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+      return;
+    }
+
     if (e.key === 'Enter') {
       e.preventDefault();
+      this._inputAllSelected = false;
       this._submitWord();
       return;
     }
 
     if (e.key === 'Backspace') {
       e.preventDefault();
-      if (this._typedInput.length > 0) {
+      if (this._inputAllSelected) {
+        this._typedInput = '';
+        this._inputAllSelected = false;
+        window.getSelection().removeAllRanges();
+      } else if (this._typedInput.length > 0) {
         this._typedInput = this._typedInput.slice(0, -1);
-        this._soundManager.play('type');
       }
+      this._soundManager.play('type');
       return;
     }
 
     if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      if (this._inputAllSelected) {
+        this._typedInput = '';
+        this._inputAllSelected = false;
+        window.getSelection().removeAllRanges();
+      }
       this._typedInput += e.key;
       this._soundManager.play('type');
     }
@@ -328,6 +353,7 @@ export class Game {
     this._wordManager.init(this._difficulty);
     this._scoreManager.startGame(this._difficulty.lives);
     this._typedInput = '';
+    this._inputAllSelected = false;
     this._matchedWord = null;
     this._state = STATE.PLAYING;
 

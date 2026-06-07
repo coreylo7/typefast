@@ -41,7 +41,7 @@ export const CONFIG = {
   },
 
   PROGRESSION: {
-    speedIncreasePerSecond: 0.015,
+    speedIncreasePerSecond: 0.008,
     spawnRateIncreasePerSecond: 0.003,
     phaseIntervalSeconds: 30,
     maxSpeedMultiplier: 3.0,
